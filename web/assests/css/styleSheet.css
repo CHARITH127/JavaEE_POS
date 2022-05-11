@@ -1,0 +1,177 @@
+/*Common elements*/
+body {
+    background: url("../images/shopping-cart-super-market.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+.header {
+    font-size: 22px;
+}
+
+.logoImage {
+    height: 78px;
+    width: 147px;
+}
+
+.Customer {
+    display: none;
+}
+
+.Item {
+    display: none;
+}
+.orderManage {
+    display: none;
+}
+
+/*place order content*/
+hr {
+    margin-top: 26px;
+}
+
+section {
+    height: 100%;
+    background-color: white;
+}
+
+#orderInvoice {
+    margin-top: 12px;
+    position: relative;
+}
+
+#CartTable {
+    margin-top: 20px;
+}
+
+#cashRow {
+    margin-top: 10px;
+}
+
+.PurchaseButton {
+    margin-top: 10px;
+}
+
+.cartTable {
+    margin-top: 66px;
+    background-color: rgba(110, 215, 234, 0.69);
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+#total {
+    font-size: 33px;
+}
+
+#totalnumber {
+    font-size: 33px;
+    color: blue;
+}
+
+#subTotal {
+    font-size: 29px;
+}
+
+#subTotalNumber {
+    font-size: 33px;
+    color: blue;
+}
+
+/*customer content*/
+hr {
+    margin-top: 0;
+}
+
+.header {
+    font-size: 22px;
+}
+
+.logoImage {
+    height: 78px;
+    width: 147px;
+}
+
+.topic {
+    width: 100%;
+}
+
+.ItemSearch {
+    height: 160px;
+    background-color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 10px;
+
+}
+
+.ItemUpdateFields{
+    background-color: white;
+    border-radius: 10px;
+}
+
+.CustomerSearch{
+    height: 160px;
+    background-color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 10px;
+}
+
+.CustomerUpdateField{
+    background-color: white;
+    border-radius: 10px;
+}
+
+.topic > p:nth-child(2) {
+    display: inline;
+}
+
+.searchButton {
+    margin-right: 2px;
+}
+
+.searchBox {
+    width: 46%;
+}
+
+.deleteButtonRow {
+    margin-top: 10px;
+}
+
+.CustomerTable {
+    margin-top: 21px;
+    margin-bottom: 21px;
+    background-color: rgba(110, 215, 234, 0.69);
+}
+
+.CustomerTable > thead > tr > th {
+    background-color: #0dcaf0;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.searchTextFeild {
+    margin-top: 12px;
+}
+
+.topic {
+    margin-top: 14px;
+    font-size: 31px;
+    padding-left: 10px;
+}
+
+.itemTable {
+    margin-top: 21px;
+    margin-bottom: 21px;
+    background-color: rgba(110, 215, 234, 0.69);
+}
+
+.itemTable > thead > tr > th {
+    background-color: #0dcaf0
+}
