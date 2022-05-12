@@ -2,6 +2,7 @@ package bo;
 
 import javax.json.*;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 
+@WebServlet(urlPatterns = "/item")
 public class ItemServlet extends HttpServlet {
 
     @Override
@@ -19,20 +21,19 @@ public class ItemServlet extends HttpServlet {
             Class.forName("com.mysql.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
 
-
             switch (option) {
                 case "SEARCH":
                     String itemCode = req.getParameter("itemCode");
-
                     PreparedStatement stm = connection.prepareStatement("select * from Item where itemCode=?");
                     stm.setObject(1, itemCode);
                     ResultSet rest = stm.executeQuery();
+
                     JsonObjectBuilder itemObject = Json.createObjectBuilder();
                     while (rest.next()) {
                         String itmCode = rest.getString(1);
                         String itemName = rest.getString(2);
                         int itemQuantity = Integer.parseInt(rest.getString(3));
-                        int itemPrice = Integer.parseInt(rest.getString(4));
+                        double itemPrice = rest.getDouble(4);
 
 
 
@@ -53,7 +54,7 @@ public class ItemServlet extends HttpServlet {
                         String itmCode = rst.getString(1);
                         String itemName = rst.getString(2);
                         int itemQty = Integer.parseInt(rst.getString(3));
-                        int itemPrice = Integer.parseInt(rst.getString(4));
+                        double itemPrice = rst.getDouble(4);
 
                         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
                         objectBuilder.add("itemCode", itmCode);
@@ -84,7 +85,7 @@ public class ItemServlet extends HttpServlet {
         String itemCode = jsonObject.getString("itemCode");
         String itemName = jsonObject.getString("itemName");
         int itemQty = Integer.parseInt(jsonObject.getString("itemQty"));
-        int itemPrice = Integer.parseInt(jsonObject.getString("itemPrice"));
+        double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
 
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
@@ -149,7 +150,7 @@ public class ItemServlet extends HttpServlet {
         String itemCode = jsonObject.getString("itemCode");
         String itemName = jsonObject.getString("itemName");
         int itemQty = Integer.parseInt(jsonObject.getString("itemQty"));
-        int itemPrice = Integer.parseInt(jsonObject.getString("itemPrice"));
+        double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
 
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
