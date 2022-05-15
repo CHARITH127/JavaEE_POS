@@ -2,15 +2,20 @@ package bo;
 
 import javax.json.*;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
+@WebServlet(urlPatterns = "/orders")
 public class orderServlet extends HttpServlet {
-    public String genarateOrderID() {
+    /*public String genarateOrderID() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
@@ -35,7 +40,7 @@ public class orderServlet extends HttpServlet {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -101,14 +106,18 @@ public class orderServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
         JsonReader reader = Json.createReader(req.getReader());
+        resp.setContentType("application/json");
         JsonObject jsonObject = reader.readObject();
         String orderId = jsonObject.getString("orderId");
-        Date orderDate = Date.valueOf(jsonObject.getString("orderDate"));
-        String customerId = jsonObject.getString("customerId");
-        double totalPrice = Double.parseDouble(jsonObject.getString("totalPrice"));
+        String orderDate = jsonObject.getString("orderDate");
+        String customerId =jsonObject.getString("customerId");
+        int totalPrice = jsonObject.getInt("totalPrice");
+
+        System.out.println(orderId+" "+orderDate+" "+customerId+" "+totalPrice);
+
         PrintWriter writer = resp.getWriter();
+
 
         try {
             Class.forName("com.mysql.jdbc.Driver");

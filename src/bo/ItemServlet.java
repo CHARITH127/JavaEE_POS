@@ -145,12 +145,6 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        JsonReader reader = Json.createReader(req.getReader());
-        JsonObject jsonObject = reader.readObject();
-        String itemCode = jsonObject.getString("itemCode");
-        String itemName = jsonObject.getString("itemName");
-        int itemQty = Integer.parseInt(jsonObject.getString("itemQty"));
-        double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
 
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
@@ -158,24 +152,46 @@ public class ItemServlet extends HttpServlet {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
-            PreparedStatement stm = connection.prepareStatement("Update Item set itemrName=?,itemQuantity=?,itemPrice=? where itemCode=?");
-            stm.setObject(1,itemName);
-            stm.setObject(2,itemQty);
-            stm.setObject(3,itemPrice);
-            stm.setObject(4,itemCode);
+            String option = req.getParameter("option");
 
-            if (stm.executeUpdate()>0) {
-                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                objectBuilder.add("status", 200);
-                objectBuilder.add("message", "Successfully Updated");
-                objectBuilder.add("data", "");
-                writer.print(objectBuilder.build());
-            }else {
-                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                objectBuilder.add("status", 400);
-                objectBuilder.add("message", "Update Failed");
-                objectBuilder.add("data", "");
-                writer.print(objectBuilder.build());
+            switch (option) {
+                case "UpdateItemQTy":
+                    String getqty =req.getParameter("Qty");
+                    String itemcode =req.getParameter("iteCode");
+                    PreparedStatement pstm = connection.prepareStatement("Update Item set itemQuantity=? where itemCode=?");
+                    pstm.setObject(1,getqty);
+                    pstm.setObject(2,itemcode);
+                    pstm.executeUpdate();
+                    break;
+
+                case "UpdateItem":
+                    JsonReader reader = Json.createReader(req.getReader());
+                    JsonObject jsonObject = reader.readObject();
+                    String itemCode = jsonObject.getString("itemCode");
+                    String itemName = jsonObject.getString("itemName");
+                    int itemQty = Integer.parseInt(jsonObject.getString("itemQty"));
+                    double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
+
+                    PreparedStatement stm = connection.prepareStatement("Update Item set itemrName=?,itemQuantity=?,itemPrice=? where itemCode=?");
+                    stm.setObject(1,itemName);
+                    stm.setObject(2,itemQty);
+                    stm.setObject(3,itemPrice);
+                    stm.setObject(4,itemCode);
+
+                    if (stm.executeUpdate()>0) {
+                        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                        objectBuilder.add("status", 200);
+                        objectBuilder.add("message", "Successfully Updated");
+                        objectBuilder.add("data", "");
+                        writer.print(objectBuilder.build());
+                    }else {
+                        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                        objectBuilder.add("status", 400);
+                        objectBuilder.add("message", "Update Failed");
+                        objectBuilder.add("data", "");
+                        writer.print(objectBuilder.build());
+                    }
+                    break;
             }
 
         } catch (ClassNotFoundException e) {
