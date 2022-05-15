@@ -101,7 +101,7 @@ $("#update").click(function () {
     }
 
     $.ajax({
-        url: "item?option=UpdateItem",
+        url: "item",
         method: "PUT",
         contentType: "application/json",
         data: JSON.stringify(updateItem),

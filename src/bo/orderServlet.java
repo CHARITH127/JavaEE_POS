@@ -12,36 +12,10 @@ import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 @WebServlet(urlPatterns = "/orders")
 public class orderServlet extends HttpServlet {
-    /*public String genarateOrderID() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
-            ResultSet rst = connection.prepareStatement("select orderID from `Order` order by orderID desc limit 1").executeQuery();
-            if (rst.next()) {
-                int tempID = Integer.parseInt(rst.getString(1).split("-")[1]);
-                tempID = tempID + 1;
-                if (tempID < 9) {
-                    return "O-00" + tempID;
-                } else if (tempID < 99) {
-                    return "O-0" + tempID;
-                } else {
-                    return "O-" + tempID;
-                }
-            } else {
-                return "O-001";
-            }
-
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }*/
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
@@ -95,6 +69,41 @@ public class orderServlet extends HttpServlet {
                     PrintWriter writer = resp.getWriter();
                     writer.print(arrayBuilder.build());
                     break;
+
+                case "getOrderID":
+                    ResultSet rset = connection.prepareStatement("select orderID from `Order` order by orderID desc limit 1").executeQuery();
+                    if (rset.next()) {
+                        int tempID = Integer.parseInt(rset.getString(1).split("-")[1]);
+                        tempID = tempID + 1;
+                        if (tempID < 9) {
+                            String id="O-00" + tempID;
+                            JsonObjectBuilder response = Json.createObjectBuilder();
+                            response.add("id", id);
+                            System.out.println(id);
+                            PrintWriter reswriter = resp.getWriter();
+                            reswriter.print(response.build());
+                        } else if (tempID < 99) {
+                            String id= "O-0" + tempID;
+                            JsonObjectBuilder response = Json.createObjectBuilder();
+                            response.add("id", id);
+                            PrintWriter reswriter = resp.getWriter();
+                            reswriter.print(response.build());
+                        } else {
+                            String id="O-" + tempID;
+                            JsonObjectBuilder response = Json.createObjectBuilder();
+                            response.add("id", id);
+                            PrintWriter reswriter = resp.getWriter();
+                            reswriter.print(response.build());
+                        }
+                    } else {
+                        String id ="O-001";
+                        JsonObjectBuilder response = Json.createObjectBuilder();
+                        response.add("id", id);
+                        PrintWriter reswriter = resp.getWriter();
+                        reswriter.print(response.build());
+                    }
+
+                    break;
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -111,38 +120,71 @@ public class orderServlet extends HttpServlet {
         JsonObject jsonObject = reader.readObject();
         String orderId = jsonObject.getString("orderId");
         String orderDate = jsonObject.getString("orderDate");
-        String customerId =jsonObject.getString("customerId");
+        String customerId = jsonObject.getString("customerId");
         int totalPrice = jsonObject.getInt("totalPrice");
-
-        System.out.println(orderId+" "+orderDate+" "+customerId+" "+totalPrice);
+        JsonArray cart = jsonObject.getJsonArray("cart");
 
         PrintWriter writer = resp.getWriter();
 
-
+        Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            connection.setAutoCommit(false);
             PreparedStatement stm = connection.prepareStatement("insert into `Order` values (?,?,?,?)");
             stm.setObject(1, orderId);
             stm.setObject(2, orderDate);
             stm.setObject(3, customerId);
             stm.setObject(4, totalPrice);
 
+            /*save order details*/
             if (stm.executeUpdate() > 0) {
-                JsonObjectBuilder response = Json.createObjectBuilder();
-                resp.setStatus(HttpServletResponse.SC_CREATED);//201
-                response.add("status", 200);
-                response.add("message", "Successfully Added");
-                response.add("data", "");
-                writer.print(response.build());
+                PreparedStatement pstm = connection.prepareStatement("INSERT INTO orderDetails VALUES(?,?,?,?,?,?)");
+
+                for (int i = 0; i < cart.size(); i++) {
+                    JsonObject obj = cart.getJsonObject(i);
+                    String itemCode = obj.getString("itemCode");
+                    String itemName = obj.getString("itemName");
+                    double unitPrice = obj.getInt("unitPrice");
+                    int qty = obj.getInt("qty");
+                    double total = obj.getInt("total");
+
+                    pstm.setObject(1, orderId);
+                    pstm.setObject(2, itemCode);
+                    pstm.setObject(3, itemName);
+                    pstm.setObject(4, unitPrice);
+                    pstm.setObject(5, qty);
+                    pstm.setObject(6, total);
+
+
+                    if (pstm.executeUpdate() > 0) {
+                        /*update item qty*/
+                        PreparedStatement statement = connection.prepareStatement("UPDATE Item SET itemQuantity=(itemQuantity-" + qty + ") WHERE itemCode='" + itemCode + "'");
+                        statement.executeUpdate();
+                        connection.commit();
+                        JsonObjectBuilder response = Json.createObjectBuilder();
+                        resp.setStatus(HttpServletResponse.SC_CREATED);//201
+                        response.add("status", 200);
+                        response.add("message", "Successfully Added");
+                        response.add("data", "");
+                        writer.print(response.build());
+                    }
+
+                }
+
             }
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
-
     }
 
     @Override

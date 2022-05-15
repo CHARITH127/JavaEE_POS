@@ -5,6 +5,20 @@ var month = ("0" + (now.getMonth() + 1)).slice(-2);
 var today = now.getFullYear() + "-" + (month) + "-" + (day);
 $('#OrderDate').val(today);
 
+/*set order ID*/
+function setOrderID(){
+    $.ajax({
+        url: "orders?option=getOrderID",
+        method: "GET",
+        success: function (resp) {
+            var oID = resp.id;
+            $("#OrderID").val(oID);
+        }
+    });
+}
+
+setOrderID();
+
 /*search customer on place order form*/
 $("#OrderCustomerId").keydown(function (event) {
 
@@ -73,8 +87,6 @@ function addToCart() {
         total:total
     }
     cartDB.push(cartTm);
-
-    updateItemQty(itemCode,newQty);
 }
 
 function loadAllDetailsToCart() {
@@ -92,7 +104,8 @@ function loadAllDetailsToCart() {
             var itemID = row.find("td:eq(0)").text();
             var itemQty = parseInt(row.find("td:eq(3)").text());
             var newQty = parseInt($("#QtyOnHand").val())+itemQty;
-            updateItemQty(itemID,newQty);
+            $("#QtyOnHand").val(newQty);
+
             setNetTotal();
         }
         loadAllDetailsToCart();
@@ -132,9 +145,6 @@ function isExitItemCode(itemCode) {
                 /*set total*/
                 setNetTotal();
 
-                /*update the item Qty*/
-                updateItemQty(itemCode,updateQty);
-
                 /*refresh the Item Table*/
                 loadAllItems();
 
@@ -163,13 +173,6 @@ function checkTheItemQtyAvailability(code) {
     } else {
         return false;
     }
-}
-
-function updateItemQty(itemCode,qty) {
-    $.ajax({
-        url: "item?option=UpdateItemQTy&Qty="+qty+"&iteCode="+itemCode,
-        method: "PUT",
-    });
 }
 
 /*calcuate balance event */
@@ -211,7 +214,7 @@ $("#purchaseOrder").click(function () {
 
 /*place order*/
 function placeOrder() {
-    var orderId ="O001"/*$("#OrderID").val()*/;
+    var orderId =$("#OrderID").val();
    var date = $("#OrderDate").val();
    var customerID = $("#OrderCustomerId").val();
    var customerTotal =parseInt($("#subTotalNumber").text());
@@ -234,6 +237,7 @@ function placeOrder() {
         success: function (resp) {
             if (resp.status == 200) { // process is  ok
                 alert(resp.message);
+                setOrderID();
                 clearAllOrderPage();
             } else if (resp.status == 400) { // there is a problem with the client side
                 alert(resp.message);
@@ -260,5 +264,5 @@ function clearAllOrderPage() {
     $("#Discount").val("");
     $("#Balance").val("");
     $(".cartTableBody").empty();
-    cartDB.splice(0,CartDB.length);
+    cartDB.splice(0,cartDB.length);
 }

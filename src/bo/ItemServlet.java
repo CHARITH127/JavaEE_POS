@@ -152,19 +152,7 @@ public class ItemServlet extends HttpServlet {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
-            String option = req.getParameter("option");
 
-            switch (option) {
-                case "UpdateItemQTy":
-                    String getqty =req.getParameter("Qty");
-                    String itemcode =req.getParameter("iteCode");
-                    PreparedStatement pstm = connection.prepareStatement("Update Item set itemQuantity=? where itemCode=?");
-                    pstm.setObject(1,getqty);
-                    pstm.setObject(2,itemcode);
-                    pstm.executeUpdate();
-                    break;
-
-                case "UpdateItem":
                     JsonReader reader = Json.createReader(req.getReader());
                     JsonObject jsonObject = reader.readObject();
                     String itemCode = jsonObject.getString("itemCode");
@@ -191,8 +179,6 @@ public class ItemServlet extends HttpServlet {
                         objectBuilder.add("data", "");
                         writer.print(objectBuilder.build());
                     }
-                    break;
-            }
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
