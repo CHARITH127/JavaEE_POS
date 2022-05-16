@@ -1,8 +1,11 @@
 package bo;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,10 +20,13 @@ public class orderDetailsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         try {
-            Class.forName("com.mysql.jdbc.Driver");
             resp.setContentType("application/json");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
             String oID = req.getParameter("oID");
             PreparedStatement stm = connection.prepareStatement("select * from orderDetails where orderID=?");
             stm.setObject(1,oID);
@@ -44,9 +50,8 @@ public class orderDetailsServlet extends HttpServlet {
             }
             PrintWriter writer = resp.getWriter();
             writer.print(arrayBuilder.build());
+            connection.close();
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

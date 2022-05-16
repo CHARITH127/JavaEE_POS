@@ -58,6 +58,13 @@ section {
     margin-top: 66px;
     background-color: rgba(110, 215, 234, 0.69);
 }
+.manageOrderTable{
+    background-color: aqua;
+}
+
+.manageOrderTableBody{
+    background-color: rgba(110, 215, 234, 0.69);
+}
 
 .footer {
     position: fixed;

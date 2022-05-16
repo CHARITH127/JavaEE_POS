@@ -1,6 +1,9 @@
 package bo;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
 import javax.json.*;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -14,12 +17,12 @@ import java.sql.*;
 public class CustomerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
         try {
             String option = req.getParameter("option");
             resp.setContentType("application/json");
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
-
+            Connection connection = bds.getConnection();
 
             switch (option) {
                 case "SEARCH":
@@ -43,6 +46,7 @@ public class CustomerServlet extends HttpServlet {
                     }
                     PrintWriter writer1 = resp.getWriter();
                     writer1.print(cutomerObject.build());
+                    connection.close();
                     break;
 
                 case "GETALL":
@@ -66,12 +70,10 @@ public class CustomerServlet extends HttpServlet {
                     }
                     PrintWriter writer = resp.getWriter();
                     writer.print(arrayBuilder.build());
+                    connection.close();
                     break;
             }
 
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -79,6 +81,10 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
         String custId = jsonObject.getString("id");
@@ -89,8 +95,7 @@ public class CustomerServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
             PreparedStatement stm = connection.prepareStatement("Insert into Customer values(?,?,?,?)");
             stm.setObject(1, custId);
             stm.setObject(2, custName);
@@ -106,9 +111,7 @@ public class CustomerServlet extends HttpServlet {
                 writer.print(response.build());
             }
 
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -117,13 +120,16 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         String id = req.getParameter("cutID");
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
             PreparedStatement stm = connection.prepareStatement("Delete from Customer where customerID=?");
             stm.setObject(1, id);
 
@@ -134,10 +140,7 @@ public class CustomerServlet extends HttpServlet {
                 objectBuilder.add("message", "Successfully Deleted");
                 writer.print(objectBuilder.build());
             }
-
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -146,6 +149,10 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
         String custId = jsonObject.getString("id");
@@ -157,8 +164,7 @@ public class CustomerServlet extends HttpServlet {
         resp.setContentType("application/json");
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
             PreparedStatement stm = connection.prepareStatement("Update Customer set customerName=?,customerAddress=?,salary=? where customerID=?");
             stm.setObject(1,custName);
             stm.setObject(2,custAddress);
@@ -178,10 +184,7 @@ public class CustomerServlet extends HttpServlet {
                 objectBuilder.add("data", "");
                 writer.print(objectBuilder.build());
             }
-
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

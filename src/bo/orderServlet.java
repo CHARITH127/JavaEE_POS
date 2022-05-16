@@ -1,6 +1,9 @@
 package bo;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
 import javax.json.*;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,11 +21,14 @@ import java.util.ArrayList;
 public class orderServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         try {
             String option = req.getParameter("option");
             resp.setContentType("application/json");
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
 
             switch (option) {
                 case "SEARCH":
@@ -45,6 +51,7 @@ public class orderServlet extends HttpServlet {
                     }
                     PrintWriter writer1 = resp.getWriter();
                     writer1.print(orderObject.build());
+                    connection.close();
                     break;
 
                 case "GETALL":
@@ -68,6 +75,7 @@ public class orderServlet extends HttpServlet {
                     }
                     PrintWriter writer = resp.getWriter();
                     writer.print(arrayBuilder.build());
+                    connection.close();
                     break;
 
                 case "getOrderID":
@@ -76,37 +84,36 @@ public class orderServlet extends HttpServlet {
                         int tempID = Integer.parseInt(rset.getString(1).split("-")[1]);
                         tempID = tempID + 1;
                         if (tempID < 9) {
-                            String id="O-00" + tempID;
+                            String id = "O-00" + tempID;
                             JsonObjectBuilder response = Json.createObjectBuilder();
                             response.add("id", id);
                             System.out.println(id);
                             PrintWriter reswriter = resp.getWriter();
                             reswriter.print(response.build());
                         } else if (tempID < 99) {
-                            String id= "O-0" + tempID;
+                            String id = "O-0" + tempID;
                             JsonObjectBuilder response = Json.createObjectBuilder();
                             response.add("id", id);
                             PrintWriter reswriter = resp.getWriter();
                             reswriter.print(response.build());
                         } else {
-                            String id="O-" + tempID;
+                            String id = "O-" + tempID;
                             JsonObjectBuilder response = Json.createObjectBuilder();
                             response.add("id", id);
                             PrintWriter reswriter = resp.getWriter();
                             reswriter.print(response.build());
                         }
                     } else {
-                        String id ="O-001";
+                        String id = "O-001";
                         JsonObjectBuilder response = Json.createObjectBuilder();
                         response.add("id", id);
                         PrintWriter reswriter = resp.getWriter();
                         reswriter.print(response.build());
                     }
-
+                    connection.close();
                     break;
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -115,6 +122,11 @@ public class orderServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
+        /*json object*/
         JsonReader reader = Json.createReader(req.getReader());
         resp.setContentType("application/json");
         JsonObject jsonObject = reader.readObject();
@@ -128,8 +140,7 @@ public class orderServlet extends HttpServlet {
 
         Connection connection = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            connection = bds.getConnection();
             connection.setAutoCommit(false);
             PreparedStatement stm = connection.prepareStatement("insert into `Order` values (?,?,?,?)");
             stm.setObject(1, orderId);
@@ -174,8 +185,7 @@ public class orderServlet extends HttpServlet {
 
             }
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         } finally {
@@ -189,11 +199,14 @@ public class orderServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         String orderId = req.getParameter("orderId");
         PrintWriter writer = resp.getWriter();
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
             PreparedStatement stm = connection.prepareStatement("Delete from `Order` where orderID=?");
             stm.setObject(1, orderId);
 
@@ -204,10 +217,8 @@ public class orderServlet extends HttpServlet {
                 objectBuilder.add("message", "Successfully Deleted");
                 writer.print(objectBuilder.build());
             }
+            connection.close();
 
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }

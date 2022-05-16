@@ -1,6 +1,9 @@
 package bo;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+
 import javax.json.*;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,12 +18,13 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         try {
             String option = req.getParameter("option");
             resp.setContentType("application/json");
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
-
+            Connection connection = bds.getConnection();
             switch (option) {
                 case "SEARCH":
                     String itemCode = req.getParameter("itemCode");
@@ -44,6 +48,7 @@ public class ItemServlet extends HttpServlet {
                     }
                     PrintWriter writer1 = resp.getWriter();
                     writer1.print(itemObject.build());
+                    connection.close();
                     break;
 
                 case "GETALL":
@@ -67,12 +72,9 @@ public class ItemServlet extends HttpServlet {
                     }
                     PrintWriter writer = resp.getWriter();
                     writer.print(arrayBuilder.build());
+                    connection.close();
                     break;
             }
-
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -80,6 +82,11 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        /*connection pool*/
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
+        /*json object*/
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
         String itemCode = jsonObject.getString("itemCode");
@@ -90,8 +97,7 @@ public class ItemServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
             PreparedStatement stm = connection.prepareStatement("Insert into Item values(?,?,?,?)");
             stm.setObject(1, itemCode);
             stm.setObject(2, itemName);
@@ -106,10 +112,8 @@ public class ItemServlet extends HttpServlet {
                 response.add("data", "");
                 writer.print(response.build());
             }
+            connection.close();
 
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -117,13 +121,18 @@ public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        /*connection pool*/
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
+
         String itemCode = req.getParameter("itemCode");
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
             PreparedStatement stm = connection.prepareStatement("Delete from Item where itemCode=?");
             stm.setObject(1, itemCode);
 
@@ -134,10 +143,7 @@ public class ItemServlet extends HttpServlet {
                 objectBuilder.add("message", "Successfully Deleted");
                 writer.print(objectBuilder.build());
             }
-
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -146,12 +152,15 @@ public class ItemServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        /*connection pool*/
+        ServletContext servletContext = req.getServletContext();
+        BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
+
         PrintWriter writer = resp.getWriter();
         resp.setContentType("application/json");
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/company", "root", "ijse");
+            Connection connection = bds.getConnection();
 
                     JsonReader reader = Json.createReader(req.getReader());
                     JsonObject jsonObject = reader.readObject();
@@ -179,9 +188,7 @@ public class ItemServlet extends HttpServlet {
                         objectBuilder.add("data", "");
                         writer.print(objectBuilder.build());
                     }
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+                    connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
