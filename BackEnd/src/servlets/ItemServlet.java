@@ -1,5 +1,7 @@
 package servlets;
 
+import bo.ItemBOImpl;
+import dto.ItemDTO;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.json.*;
@@ -12,9 +14,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.ArrayList;
 
 @WebServlet(urlPatterns = "/item")
 public class ItemServlet extends HttpServlet {
+
+    ItemBOImpl itemBO = new ItemBOImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -28,54 +33,35 @@ public class ItemServlet extends HttpServlet {
             switch (option) {
                 case "SEARCH":
                     String itemCode = req.getParameter("itemCode");
-                    PreparedStatement stm = connection.prepareStatement("select * from Item where itemCode=?");
-                    stm.setObject(1, itemCode);
-                    ResultSet rest = stm.executeQuery();
-
                     JsonObjectBuilder itemObject = Json.createObjectBuilder();
-                    while (rest.next()) {
-                        String itmCode = rest.getString(1);
-                        String itemName = rest.getString(2);
-                        int itemQuantity = Integer.parseInt(rest.getString(3));
-                        double itemPrice = rest.getDouble(4);
-
-
-
-                        itemObject.add("itemCode", itmCode);
-                        itemObject.add("itemName", itemName);
-                        itemObject.add("itemQty", itemQuantity);
-                        itemObject.add("itemPrice", itemPrice);
-                    }
+                    ItemDTO item = itemBO.getItem(itemCode, connection);
+                    itemObject.add("itemCode", item.getItemCode());
+                    itemObject.add("itemName", item.getItemName());
+                    itemObject.add("itemQty", item.getQtyOnHand());
+                    itemObject.add("itemPrice", item.getUnitPrice());
                     PrintWriter writer1 = resp.getWriter();
                     writer1.print(itemObject.build());
                     connection.close();
                     break;
 
                 case "GETALL":
-                    ResultSet rst = connection.prepareStatement("select * from Item").executeQuery();
-
                     JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                    while (rst.next()) {
-                        String itmCode = rst.getString(1);
-                        String itemName = rst.getString(2);
-                        int itemQty = Integer.parseInt(rst.getString(3));
-                        double itemPrice = rst.getDouble(4);
-
+                    ArrayList<ItemDTO> allItems = itemBO.getAllItems(connection);
+                    for (int i = 0; i < allItems.size(); i++) {
                         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                        objectBuilder.add("itemCode", itmCode);
-                        objectBuilder.add("itemName", itemName);
-                        objectBuilder.add("itemQty", itemQty);
-                        objectBuilder.add("itemPrice", itemPrice);
+                        objectBuilder.add("itemCode", allItems.get(i).getItemCode());
+                        objectBuilder.add("itemName", allItems.get(i).getItemName());
+                        objectBuilder.add("itemQty", allItems.get(i).getQtyOnHand());
+                        objectBuilder.add("itemPrice", allItems.get(i).getUnitPrice());
 
                         arrayBuilder.add(objectBuilder.build());
-
                     }
                     PrintWriter writer = resp.getWriter();
                     writer.print(arrayBuilder.build());
                     connection.close();
                     break;
             }
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
     }
@@ -98,13 +84,7 @@ public class ItemServlet extends HttpServlet {
         resp.setContentType("application/json");
         try {
             Connection connection = bds.getConnection();
-            PreparedStatement stm = connection.prepareStatement("Insert into Item values(?,?,?,?)");
-            stm.setObject(1, itemCode);
-            stm.setObject(2, itemName);
-            stm.setObject(3, itemQty);
-            stm.setObject(4, itemPrice);
-
-            if (stm.executeUpdate() > 0) {
+            if (itemBO.addItem(new ItemDTO(itemCode,itemName,itemQty,itemPrice),connection)) {
                 JsonObjectBuilder response = Json.createObjectBuilder();
                 resp.setStatus(HttpServletResponse.SC_CREATED);//201
                 response.add("status", 200);
@@ -114,7 +94,7 @@ public class ItemServlet extends HttpServlet {
             }
             connection.close();
 
-        } catch (SQLException throwables) {
+        } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
     }
@@ -133,10 +113,7 @@ public class ItemServlet extends HttpServlet {
 
         try {
             Connection connection = bds.getConnection();
-            PreparedStatement stm = connection.prepareStatement("Delete from Item where itemCode=?");
-            stm.setObject(1, itemCode);
-
-            if (stm.executeUpdate() > 0) {
+            if (itemBO.deleteItem(itemCode,connection)) {
                 JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
                 objectBuilder.add("status", 200);
                 objectBuilder.add("data", "");
@@ -146,6 +123,8 @@ public class ItemServlet extends HttpServlet {
             connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -162,34 +141,27 @@ public class ItemServlet extends HttpServlet {
         try {
             Connection connection = bds.getConnection();
 
-                    JsonReader reader = Json.createReader(req.getReader());
-                    JsonObject jsonObject = reader.readObject();
-                    String itemCode = jsonObject.getString("itemCode");
-                    String itemName = jsonObject.getString("itemName");
-                    int itemQty = Integer.parseInt(jsonObject.getString("itemQty"));
-                    double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
-
-                    PreparedStatement stm = connection.prepareStatement("Update Item set itemrName=?,itemQuantity=?,itemPrice=? where itemCode=?");
-                    stm.setObject(1,itemName);
-                    stm.setObject(2,itemQty);
-                    stm.setObject(3,itemPrice);
-                    stm.setObject(4,itemCode);
-
-                    if (stm.executeUpdate()>0) {
-                        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                        objectBuilder.add("status", 200);
-                        objectBuilder.add("message", "Successfully Updated");
-                        objectBuilder.add("data", "");
-                        writer.print(objectBuilder.build());
-                    }else {
-                        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                        objectBuilder.add("status", 400);
-                        objectBuilder.add("message", "Update Failed");
-                        objectBuilder.add("data", "");
-                        writer.print(objectBuilder.build());
-                    }
-                    connection.close();
-        } catch (SQLException throwables) {
+            JsonReader reader = Json.createReader(req.getReader());
+            JsonObject jsonObject = reader.readObject();
+            String itemCode = jsonObject.getString("itemCode");
+            String itemName = jsonObject.getString("itemName");
+            int itemQty = Integer.parseInt(jsonObject.getString("itemQty"));
+            double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
+            if (itemBO.updateItem(new ItemDTO(itemCode,itemName,itemQty,itemPrice),connection)) {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("status", 200);
+                objectBuilder.add("message", "Successfully Updated");
+                objectBuilder.add("data", "");
+                writer.print(objectBuilder.build());
+            } else {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("status", 400);
+                objectBuilder.add("message", "Update Failed");
+                objectBuilder.add("data", "");
+                writer.print(objectBuilder.build());
+            }
+            connection.close();
+        } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
         }
     }

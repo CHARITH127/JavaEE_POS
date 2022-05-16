@@ -1,5 +1,8 @@
 package servlets;
 
+import bo.OrderBOImpl;
+import dto.OrderDTO;
+import dto.OrderDetailsDTO;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.json.*;
@@ -12,9 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.ArrayList;
 
 @WebServlet(urlPatterns = "/orders")
 public class orderServlet extends HttpServlet {
+
+    OrderBOImpl orderBO = new OrderBOImpl();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -28,46 +35,31 @@ public class orderServlet extends HttpServlet {
 
             switch (option) {
                 case "SEARCH":
-                    String itemCode = req.getParameter("itemCode");
-                    PreparedStatement stm = connection.prepareStatement("select * from Item where itemCode=?");
-                    stm.setObject(1, itemCode);
-                    ResultSet rest = stm.executeQuery();
-
+                    String orderID = req.getParameter("orderID");
                     JsonObjectBuilder orderObject = Json.createObjectBuilder();
-                    while (rest.next()) {
-                        String orderId = rest.getString(1);
-                        Date orderDate = rest.getDate(2);
-                        String customerId = rest.getString(3);
-                        double totalPrice = rest.getDouble(4);
 
-                        orderObject.add("orderId", orderId);
-                        orderObject.add("orderDate", String.valueOf(orderDate));
-                        orderObject.add("customerId", customerId);
-                        orderObject.add("totalPrice", totalPrice);
-                    }
+                    OrderDTO order = orderBO.getOrder(orderID, connection);
+
+                    orderObject.add("orderId", order.getOrderId());
+                    orderObject.add("orderDate", String.valueOf(order.getoDate()));
+                    orderObject.add("customerId", order.getCustomerId());
+                    orderObject.add("totalPrice", order.getTotal());
                     PrintWriter writer1 = resp.getWriter();
                     writer1.print(orderObject.build());
                     connection.close();
                     break;
 
                 case "GETALL":
-                    ResultSet rst = connection.prepareStatement("select * from `Order`").executeQuery();
-
+                    ArrayList<OrderDTO> allOrders = orderBO.getAllOrders(connection);
                     JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-                    while (rst.next()) {
-                        String orderId = rst.getString(1);
-                        Date orderDate = rst.getDate(2);
-                        String customerId = rst.getString(3);
-                        double totalPrice = rst.getDouble(4);
-
+                    for (int i = 0; i < allOrders.size(); i++) {
                         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                        objectBuilder.add("orderId", orderId);
-                        objectBuilder.add("orderDate", String.valueOf(orderDate));
-                        objectBuilder.add("customerId", customerId);
-                        objectBuilder.add("totalPrice", totalPrice);
+                        objectBuilder.add("orderId", allOrders.get(i).getOrderId());
+                        objectBuilder.add("orderDate", String.valueOf(allOrders.get(i).getoDate()));
+                        objectBuilder.add("customerId", allOrders.get(i).getCustomerId());
+                        objectBuilder.add("totalPrice", allOrders.get(i).getTotal());
 
                         arrayBuilder.add(objectBuilder.build());
-
                     }
                     PrintWriter writer = resp.getWriter();
                     writer.print(arrayBuilder.build());
@@ -75,43 +67,19 @@ public class orderServlet extends HttpServlet {
                     break;
 
                 case "getOrderID":
-                    ResultSet rset = connection.prepareStatement("select orderID from `Order` order by orderID desc limit 1").executeQuery();
-                    if (rset.next()) {
-                        int tempID = Integer.parseInt(rset.getString(1).split("-")[1]);
-                        tempID = tempID + 1;
-                        if (tempID < 9) {
-                            String id = "O-00" + tempID;
-                            JsonObjectBuilder response = Json.createObjectBuilder();
-                            response.add("id", id);
-                            System.out.println(id);
-                            PrintWriter reswriter = resp.getWriter();
-                            reswriter.print(response.build());
-                        } else if (tempID < 99) {
-                            String id = "O-0" + tempID;
-                            JsonObjectBuilder response = Json.createObjectBuilder();
-                            response.add("id", id);
-                            PrintWriter reswriter = resp.getWriter();
-                            reswriter.print(response.build());
-                        } else {
-                            String id = "O-" + tempID;
-                            JsonObjectBuilder response = Json.createObjectBuilder();
-                            response.add("id", id);
-                            PrintWriter reswriter = resp.getWriter();
-                            reswriter.print(response.build());
-                        }
-                    } else {
-                        String id = "O-001";
-                        JsonObjectBuilder response = Json.createObjectBuilder();
-                        response.add("id", id);
-                        PrintWriter reswriter = resp.getWriter();
-                        reswriter.print(response.build());
-                    }
+                    String genOId = orderBO.genarateOrderID(connection);
+                    JsonObjectBuilder response = Json.createObjectBuilder();
+                    response.add("id", genOId);
+                    PrintWriter reswriter = resp.getWriter();
+                    reswriter.print(response.build());
                     connection.close();
                     break;
             }
             
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
     }
@@ -127,7 +95,7 @@ public class orderServlet extends HttpServlet {
         resp.setContentType("application/json");
         JsonObject jsonObject = reader.readObject();
         String orderId = jsonObject.getString("orderId");
-        String orderDate = jsonObject.getString("orderDate");
+        Date orderDate = Date.valueOf(jsonObject.getString("orderDate"));
         String customerId = jsonObject.getString("customerId");
         int totalPrice = jsonObject.getInt("totalPrice");
         JsonArray cart = jsonObject.getJsonArray("cart");
@@ -138,14 +106,9 @@ public class orderServlet extends HttpServlet {
         try {
             connection = bds.getConnection();
             connection.setAutoCommit(false);
-            PreparedStatement stm = connection.prepareStatement("insert into `Order` values (?,?,?,?)");
-            stm.setObject(1, orderId);
-            stm.setObject(2, orderDate);
-            stm.setObject(3, customerId);
-            stm.setObject(4, totalPrice);
 
             /*save order details*/
-            if (stm.executeUpdate() > 0) {
+            if (orderBO.addOrder(new OrderDTO(orderId,orderDate,customerId,totalPrice),connection)) {
                 PreparedStatement pstm = connection.prepareStatement("INSERT INTO orderDetails VALUES(?,?,?,?,?,?)");
 
                 for (int i = 0; i < cart.size(); i++) {
@@ -162,6 +125,8 @@ public class orderServlet extends HttpServlet {
                     pstm.setObject(4, unitPrice);
                     pstm.setObject(5, qty);
                     pstm.setObject(6, total);
+
+                    ArrayList<OrderDetailsDTO> detailsDTOS = new ArrayList<>();
 
 
                     if (pstm.executeUpdate() > 0) {
@@ -184,6 +149,8 @@ public class orderServlet extends HttpServlet {
             connection.close();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } finally {
             try {
                 connection.setAutoCommit(true);
@@ -203,10 +170,7 @@ public class orderServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         try {
             Connection connection = bds.getConnection();
-            PreparedStatement stm = connection.prepareStatement("Delete from `Order` where orderID=?");
-            stm.setObject(1, orderId);
-
-            if (stm.executeUpdate() > 0) {
+            if (orderBO.deleteOrderId(orderId,connection)) {
                 JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
                 objectBuilder.add("status", 200);
                 objectBuilder.add("data", "");
@@ -217,6 +181,8 @@ public class orderServlet extends HttpServlet {
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
 

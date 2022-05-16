@@ -1,5 +1,7 @@
 package servlets;
 
+import bo.OrderDetailsBOImpl;
+import dto.OrderDetailsDTO;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import javax.json.Json;
@@ -14,13 +16,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
+import java.util.ArrayList;
 
 @WebServlet(urlPatterns = "/orderDetails")
 public class orderDetailsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+        OrderDetailsBOImpl detailsBO = new OrderDetailsBOImpl();
         ServletContext servletContext = req.getServletContext();
         BasicDataSource bds = (BasicDataSource) servletContext.getAttribute("bds");
 
@@ -28,23 +31,15 @@ public class orderDetailsServlet extends HttpServlet {
             resp.setContentType("application/json");
             Connection connection = bds.getConnection();
             String oID = req.getParameter("oID");
-            PreparedStatement stm = connection.prepareStatement("select * from orderDetails where orderID=?");
-            stm.setObject(1,oID);
-            ResultSet set = stm.executeQuery();
+            ArrayList<OrderDetailsDTO> orderDet = detailsBO.getOrderDetails(oID, connection);
             JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-            while (set.next()) {
-                String itmCode = set.getString(2);
-                String itmName = set.getString(3);
-                double itmPrice = set.getDouble(4);
-                int itmQty = set.getInt(5);
-                double total = set.getDouble(6);
-
+            for (int i = 0; i < orderDet.size(); i++) {
                 JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                objectBuilder.add("itemCode", itmCode);
-                objectBuilder.add("itemName", itmName);
-                objectBuilder.add("itemPrice", itmPrice);
-                objectBuilder.add("itemQty", itmQty);
-                objectBuilder.add("total", total);
+                objectBuilder.add("itemCode", orderDet.get(i).getItemCode());
+                objectBuilder.add("itemName", orderDet.get(i).getItemName());
+                objectBuilder.add("itemPrice", orderDet.get(i).getPrice());
+                objectBuilder.add("itemQty", orderDet.get(i).getQty());
+                objectBuilder.add("total", orderDet.get(i).getTotal());
 
                 arrayBuilder.add(objectBuilder.build());
             }
@@ -54,6 +49,8 @@ public class orderDetailsServlet extends HttpServlet {
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
     }
