@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>POS System</title>
+    <link rel="stylesheet" href="assests/css/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assests/css/styleSheet.css">
+    <meta name="viewport" content="width=device-width initial scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="assests/fonts/css/all.css">
+</head>
+<body>
+<!--===============================nav bar==================================================-->
+
+<nav class="header navbar navbar-expand-lg  shadow navbar-light bg-light">
+
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="#">
+                <img class="logoImage" src="assests/images/supermarketLogo.jpg" alt="" width="30" height="24">
+            </a>
+            Wish POS System</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item ">
+                    <a id="home" class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li id="order" class="nav-item">
+                    <a class="nav-link" href="#">Orders</a>
+                </li>
+                <li id="item" class="nav-item">
+                    <a class="nav-link" href="#">Items</a>
+                </li>
+                <li id="customer" class="nav-item">
+                    <a class="nav-link" href="#">Customers</a>
+                </li>
+                <li id="others" class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Others
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="#">Version</a></li>
+                        <li><a class="dropdown-item" href="#">About Us</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!--===============================main content==============================================-->
+
+<!--Place Order page main content-->
+<main id="orderInvoice" class="container">
+    <!---->
+    <div class="container">
+        <div class="row gap-5">
+
+            <!--Customer Details-->
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-4 bg-light shadow">
+                <div class="row bg-info">
+                    <p>
+                        Invoice Details
+                    </p>
+                </div>
+                <!--first row-->
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="OrderID" class="form-label">Order ID:</label>
+                                <input type="text" class="form-control" id="OrderID" placeholder="Order ID">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="OrderDate" class="form-label">Order Date</label>
+                                <input type="text" class="form-control " id="OrderDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--second row-->
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">Customer:</label>
+                                <select class="form-select" aria-label="Default select example">
+                                    <option selected>None</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">Customer ID:</label>
+                                <input type="text" class="form-control" id="OrderCustomerId"
+                                       placeholder="Customer ID">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--third row-->
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label for="CustomerName" class="form-label">Name:</label>
+                                    <input type="text" class="form-control" id="OrderCustomerName"
+                                           placeholder="Customer ID">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="CustomerSalary" class="form-label">Salary:</label>
+                                <input type="text" class="form-control" id="OrderCustomerSalary"
+                                       placeholder="Customer Salary">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--fourth row-->
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <div class="mb-3">
+                                    <label for="CustomerAddress" class="form-label">Addres:</label>
+                                    <input type="text" class="form-control" id="OrderCustomerAddress"
+                                           placeholder="Customer Address">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Item Select-->
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-4 bg-light shadow">
+                <div class="row bg-info">
+                    <p>
+                        Item Select
+                    </p>
+                </div>
+                <div class="container">
+                    <!--first row-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">Item:</label>
+                                <select class="form-select" aria-label="Default select example">
+                                    <option selected>None</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">Item Code:</label>
+                                <input type="text" class="form-control" id="OrderItemCode" placeholder="ItemCode">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--seecond Row-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">Item Name:</label>
+                                <input type="text" class="form-control" id="OrderItemName" placeholder="Order Quantity">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--third Row-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label class="form-label">QtyOnH:</label>
+                                <input type="text" class="form-control" id="QtyOnHand" placeholder="ItemName">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="CustomerSalary" class="form-label">Item Price:</label>
+                                <input type="text" class="form-control" id="OrderItemPrice" placeholder="Item Price">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="QtyOnHand" class="form-label">OrderQty:</label>
+                                <input type="text" class="form-control" id="OrderQuantity" placeholder="Qty On Hand">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--fourth Row-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="float-end">
+                                <button id="addToCart" type="button" class="btn btn-primary">Add item to cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--pricing form-->
+            <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-6 col-xxl-3 bg-light shadow">
+                <div class="container">
+                    <!--first row-->
+                    <div class="row">
+                        <div class="col">
+                            <label id="total" class="form-label">Total :</label>
+                            <label id="totalnumber" class="form-label">1540/=</label>
+                        </div>
+                    </div>
+                    <!--second row-->
+                    <div class="row">
+                        <div class="col">
+                            <label id="subTotal" class="form-label">Sub Total :</label>
+                            <label id="subTotalNumber" class="form-label">1440/=</label>
+                        </div>
+                    </div>
+                    <!--third row-->
+                    <div id="cashRow" class="row">
+                        <div class="col">
+                            <label class="form-label">Cash :</label>
+                            <input type="text" class="form-control" id="cash" placeholder="Cash">
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Discount :</label>
+                            <input type="text" class="form-control" id="Discount" placeholder="Discount">
+                        </div>
+
+                    </div>
+                    <!--fourth row-->
+                    <div class="row">
+                        <div class="col">
+                            <label class="form-label">Balance :</label>
+                            <input type="text" class="form-control" id="Balance" placeholder="Balance">
+                        </div>
+                    </div>
+                    <!--fiveth row-->
+                    <div class="PurchaseButton row">
+                        <div class="col">
+                            <div class="text-center">
+                                <button id="purchaseOrder" type="button" class="btn btn-primary">Purchase</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--cart table-->
+    <table class="cartTable table">
+        <thead>
+        <tr>
+            <th scope="col">Item Code</th>
+            <th scope="col">Item Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Total</th>
+        </tr>
+        </thead>
+        <tbody class="cartTableBody">
+        </tbody>
+    </table>
+</main>
+
+<!--order managment page main content-->
+<main id="orderManagement" class="orderManage container">
+    <!--topic-->
+    <div class="topic container">
+        <div class="row">
+            <div class="col">
+                <div class="mb-3">
+                    <section class="topic bg-light">
+                        <i class="fas fa-boxes"></i>
+                        <p>Order Manage</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--navigation path-->
+    <div class="container">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Order Manage</li>
+            </ol>
+        </nav>
+        <hr>
+    </div>
+
+    <div class="container">
+        <div class="container">
+            <div class="row">
+                <div class="row">
+                    <!--Item search-->
+                    <div class="ItemSearch col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6">
+                        <div class="row bg-info">
+                            <p>
+                                Search Order
+                            </p>
+                        </div>
+                        <!--first row-->
+                        <div class="searchTextFeild container">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" id="searchOrder"
+                                               placeholder="Input ItemName/Code Here">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--second row-->
+                        <div class="container">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="searchButton float-start">
+                                        <button id="btnsearchOrder" type="button" class="btn btn-primary">Search Order
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!--Customer id-->
+                    <div class="customerID col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6">
+                        <div class="row ">
+                            <p>
+                                Customer ID
+                            </p>
+                        </div>
+                        <!--first row-->
+                        <div class="searchTextFeild container">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" id="manageOrderCustomerID"
+                                               placeholder="Input ItemName/Code Here">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--order manage table -->
+                <table class="manageOrderTable table ">
+                    <thead>
+                    <tr>
+                        <!--<th scope="col">Row Number</th>-->
+                        <th scope="col">Item Code</th>
+                        <th scope="col">Item Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Total</th>
+                    </tr>
+                    </thead>
+                    <tbody class="manageOrderTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!--Customer page main content-->
+<main id="customerManage" class="Customer container">
+
+    <!--topic-->
+    <div class=" topic container">
+        <div class="row">
+            <div class="col">
+                <div class="mb-3">
+                    <section class="topic bg-light">
+                        <i class="fas fa-users"></i>
+                        <p>Custmer</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--navigation path-->
+    <div class="container">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item activitemPriceRegxe" aria-current="page">Customer</li>
+            </ol>
+        </nav>
+        <hr>
+    </div>
+
+    <div class="container">
+        <div class="container">
+            <div class="row gap-5">
+                <!--Customer search-->
+                <div class="CustomerSearch col-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
+                    <div class="row bg-info">
+                        <p>
+                            Customer Search
+                        </p>
+                    </div>
+                    <!--first row-->
+                    <div class="searchTextFeild container">
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="CustomerSearch"
+                                           placeholder="Input Name/NIC/Tp Here">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--second row-->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <div class="searchButton float-start">
+                                    <button id="btnSearchCustomer" type="button" class="btn btn-primary">Search</button>
+                                </div>
+                                <select class="searchBox form-select" aria-label="Default select example">
+                                    <option selected>None</option>
+                                    <option value="1">Name</option>
+                                    <option value="2">NIC</option>
+                                    <option value="3">Tp</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!--Customer Operation buttons-->
+                <div class="CustomerUpdateField col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6">
+                    <!--first row-->
+                    <div class="container">
+                        <!--first row customerId-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerID" class="form-label">Customer ID:</label>
+                                    <input type="text" class="form-control" id="searchCustomerID"
+                                           placeholder="Cutomer ID">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Second Row customer name-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerName" class="form-label">Customer Name:</label>
+                                    <input type="text" class="form-control" id="searchCustomerName"
+                                           placeholder="CustomerName">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--third Row-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerAddress" class="form-label">Customer Address:</label>
+                                    <input type="text" class="form-control" id="searchCustomerAddress"
+                                           placeholder="Customer Address">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--fourth Row customer salary-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerSalary" class="form-label">Customer Salary:</label>
+                                    <input type="text" class="form-control" id="searchCustomerSalary"
+                                           placeholder="Customer Salary">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--New Customer Button bar-->
+            <div class="deleteButtonRow container">
+                <div class="row">
+                    <div class="container">
+                        <div class="col">
+                            <div class="searchButton float-start">
+                                <button id="saveNewCustmer" type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#newCustomerModal"> Save new Customer
+                                </button>
+                            </div>
+                            <div class="searchButton float-start">
+                                <button id="updateCustomer" type="button" class="btn btn-primary">Update</button>
+                            </div>
+                            <div class="searchButton float-start">
+                                <button id="clearAllCustomer" type="button" class="btn btn-primary">Clear All</button>
+                            </div>
+                            <div class="searchButton float-start">
+                                <button id="deleteCustomer" type="button" class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--All customer Details-->
+    <table class="CustomerTable table ">
+        <thead>
+        <tr>
+            <!--<th scope="col">RowNumber</th>-->
+            <th scope="col">Customer ID</th>
+            <th scope="col">Customer Name</th>
+            <th scope="col">Customer Address</th>
+            <th scope="col">Customer Salary</th>
+        </tr>
+        </thead>
+        <tbody class="customerTableBody">
+        </tbody>
+    </table>
+
+    <!--Add new Customer Modal-->
+    <!-- Modal -->
+    <div class="modal fade" id="newCustomerModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add New Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <!--first row customerId-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerID" class="form-label">Customer ID:</label>
+                                    <input type="text" class="form-control" id="CustomerID" placeholder="Cutomer ID">
+                                    <p><small class="text-danger pl-1" id="lblcustomerID"></small></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Second Row customer name-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerName" class="form-label">Customer Name:</label>
+                                    <input type="text" class="form-control" id="CustomerName"
+                                           placeholder="CustomerName">
+                                    <p><small class="text-danger pl-1" id="lblcustomerName"></small></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--third Row-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerAddress" class="form-label">Customer Address:</label>
+                                    <input type="text" class="form-control" id="CustomerAddress"
+                                           placeholder="Customer Address">
+                                    <p><small class="text-danger pl-1" id="lblcustomerAddress"></small></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--fourth Row customer salary-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerSalary" class="form-label">Customer Salary:</label>
+                                    <input type="text" class="form-control" id="CustomerSalary"
+                                           placeholder="Customer Salary">
+                                    <p><small class="text-danger pl-1" id="lblcustomerSalary"></small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="btn_AddCustomer" type="button" class="btn btn-primary">Add Customer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!--Item page main content-->
+<main id="itemManage" class="Item container">
+    <!--topic-->
+    <div class="topic container">
+        <div class="row">
+            <div class="col">
+                <div class="mb-3">
+                    <section class="topic bg-light">
+                        <i class="fas fa-boxes"></i>
+                        <p>Items</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--navigation path-->
+    <div class="container">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Item</li>
+            </ol>
+        </nav>
+        <hr>
+    </div>
+
+    <div class="container">
+        <div class="container">
+            <div class="row gap-5">
+                <!--Item search-->
+                <div class="ItemSearch col-12 col-sm-12 col-md-12 col-lg-12 col-xl-5 col-xxl-5">
+                    <div class="row bg-info">
+                        <p>
+                            Item Search
+                        </p>
+                    </div>
+                    <!--first row-->
+                    <div class="searchTextFeild container">
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="ItemSearch"
+                                           placeholder="Input ItemName/Code Here">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--second row-->
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <div class="searchButton float-start">
+                                    <button id="searchButten" type="button" class="btn btn-primary">Filter Mode</button>
+                                </div>
+                                <select class="searchBox form-select" aria-label="Default select example">
+                                    <option selected>None</option>
+                                    <option value="1">Name</option>
+                                    <option value="2">Code</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!--Item Update Text Fields-->
+                <div class="ItemUpdateFields col-12 col-sm-12 col-md-12 col-lg-12 col-xl-6 col-xxl-6">
+                    <!--first row-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="searchItemCode" class="form-label">Item Code:</label>
+                                <input type="text" class="form-control" id="searchItemCode" placeholder="Item Code">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--second row-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="searchItemName" class="form-label">Item Name:</label>
+                                <input type="text" class="form-control" id="searchItemName" placeholder="Item Name">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--third row-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="searchItemQuantity" class="form-label">Item Quantity:</label>
+                                <input type="text" class="form-control" id="searchItemQuantity"
+                                       placeholder="Item Quantity">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--fourth Row item price-->
+                    <div class="row">
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="searchItemPrice" class="form-label">Item Price:</label>
+                                <input type="text" class="form-control" id="searchItemPrice"
+                                       placeholder="Item Price">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--New Item Button bar-->
+            <div class="deleteButtonRow container">
+                <div class="row">
+                    <div class="container">
+                        <div class="col">
+                            <div class="searchButton float-start">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#newItemModal"> Save new Item
+                                </button>
+                            </div>
+                            <div class="searchButton float-start">
+                                <button id="update" type="button" class="btn btn-primary">Update</button>
+                            </div>
+                            <div class="searchButton float-start">
+                                <button id="clearAll" type="button" class="btn btn-primary">Clear All</button>
+                            </div>
+                            <div class="searchButton float-start">
+                                <button id="deleteItem" type="button" class="btn btn-danger">Delete Item</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Table-->
+    <table class="itemTable table ">
+        <thead>
+        <tr>
+            <!--<th scope="col">Row Number</th>-->
+            <th scope="col">Item Code</th>
+            <th scope="col">Item Name</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">price</th>
+        </tr>
+        </thead>
+        <tbody class="itemTableBody">
+        </tbody>
+    </table>
+
+    <!--Add new Item Modal-->
+    <!-- Modal -->
+    <div class="modal fade" id="newItemModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addNewItem">Add New Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <!--first row itemCode-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="ItemCode" class="form-label">Item Code:</label>
+                                    <input type="text" class="form-control" id="ItemCode" placeholder="Item Code">
+                                    <p><small class="text-danger  pl-1" id="lbleItemCode"></small></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Second Row item name-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="ItemName" class="form-label">Item Name:</label>
+                                    <input type="text" class="form-control" id="ItemName" placeholder="Item Name">
+                                    <p><small class="text-danger  pl-1" id="lbleItemName"></small></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--third Row-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="ItemQuantity" class="form-label">Item Quantity:</label>
+                                    <input type="text" class="form-control" id="ItemQuantity"
+                                           placeholder="Item Quantity">
+                                    <p><small class="text-danger  pl-1" id="lbleItemQuantity"></small></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--fourth Row item price-->
+                        <div class="row">
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="ItemPrice" class="form-label">Item Price:</label>
+                                    <input type="text" class="form-control" id="ItemPrice" placeholder="Item Price">
+                                    <p><small class="text-danger  pl-1" id="lbleItemPrice"></small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="btn_AddNewItem" type="button" class="btn btn-primary">Add Item</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!--===============================page footer==============================================-->
+<div class="footer footer-copyright text-center py-3">© 2022 Copyright|
+    This site developed By|<a href="">W.C.Wishvajith</a>
+</div>
+
+<script src="assests/css/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+<script src="assests/jQuery/jquery-3.6.0.min.js"></script>
+<script src="assests/js/indexJs.js"></script>
+<script src="script/customerController.js"></script>
+<script src="script/itemController.js"></script>
+<script src="script/orderController.js"></script>
+<script src="script/orderDetailsController.js"></script>
+</body>
+</html>
