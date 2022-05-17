@@ -53,6 +53,20 @@ $("#OrderItemCode").keydown(function (event) {
                 $("#OrderItemPrice").val(res.itemPrice);
             }
         });
+        $("#OrderQuantity").focus();
+
+    }
+});
+
+$("#OrderQuantity").keydown(function (e) {
+    if (e.key == "Enter") {
+        $("#addToCart").attr("disabled", false);
+    }
+})
+
+$("#cash").keydown(function (e) {
+    if (e.key == "Enter") {
+        $("#purchaseOrder").attr("disabled", false);
     }
 });
 
@@ -208,6 +222,8 @@ function calculateBalance(cash) {
 
 $("#purchaseOrder").click(function () {
     placeOrder();
+    $("#addToCart").attr("disabled", true);
+    $("#purchaseOrder").attr("disabled", true);
 });
 
 
