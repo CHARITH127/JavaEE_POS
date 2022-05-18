@@ -1,13 +1,11 @@
 package dao.custom.impl;
 
-import dto.OrderDTO;
-import dto.OrderDetailsDTO;
+
+import dao.CrudUtil;
 import entity.OrderDetails;
 
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,10 +40,7 @@ public class orderDetailsDAOImpl implements dao.custom.orderDetailsDAO {
 
     @Override
     public ArrayList<OrderDetails> getOrderDetails(String oid,Connection connection)throws SQLException, ClassNotFoundException{
-        PreparedStatement stm = connection.prepareStatement("select * from orderDetails where orderID=?");
-        stm.setObject(1,oid);
-        ResultSet set = stm.executeQuery();
-        JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+        ResultSet set = CrudUtil.executeQuery("select * from orderDetails where orderID=?", connection, oid);
         ArrayList<OrderDetails> orderDetails = new ArrayList<>();
         while (set.next()) {
             OrderDetails orderDe = new OrderDetails();

@@ -1,9 +1,10 @@
 package dao.custom.impl;
 
+import dao.CrudUtil;
 import dao.custom.CustomerDAO;
 import entity.Customer;
+
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,23 +12,13 @@ import java.util.ArrayList;
 public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
-    public boolean add(Customer customer, Connection connection) throws SQLException {
-        PreparedStatement stm = connection.prepareStatement("Insert into Customer values(?,?,?,?)");
-        stm.setObject(1, customer.getCustomerID());
-        stm.setObject(2, customer.getCustomerName());
-        stm.setObject(3, customer.getCustomerAddress());
-        stm.setObject(4, customer.getCustomerSalary());
-
-        if (stm.executeUpdate() > 0) {
-            connection.close();
-            return true;
-        }
-        return false;
+    public boolean add(Customer customer, Connection connection) throws SQLException, ClassNotFoundException {
+        return CrudUtil.executeUpdate("Insert into Customer values(?,?,?,?)", connection, customer.getCustomerID(), customer.getCustomerName(), customer.getCustomerAddress(), customer.getCustomerSalary());
     }
 
     @Override
-    public ArrayList<Customer> getAll(Connection connection)throws SQLException, ClassNotFoundException{
-        ResultSet rst = connection.prepareStatement("select * from Customer").executeQuery();
+    public ArrayList<Customer> getAll(Connection connection) throws SQLException, ClassNotFoundException {
+        ResultSet rst = CrudUtil.executeQuery("select * from Customer", connection);
         ArrayList<Customer> customers = new ArrayList<>();
         while (rst.next()) {
             Customer customer = new Customer();
@@ -44,9 +35,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public Customer search(String Cid, Connection connection) throws SQLException, ClassNotFoundException {
-        PreparedStatement stm = connection.prepareStatement("select * from Customer where customerID=?");
-        stm.setObject(1, Cid);
-        ResultSet rest = stm.executeQuery();
+        ResultSet rest = CrudUtil.executeQuery("select * from Customer where customerID=?", connection, Cid);
         Customer customer = new Customer();
         while (rest.next()) {
             customer.setCustomerID(rest.getString(1));
@@ -59,26 +48,11 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public boolean update(Customer customer, Connection connection) throws SQLException, ClassNotFoundException {
-        PreparedStatement stm = connection.prepareStatement("Update Customer set customerName=?,customerAddress=?,salary=? where customerID=?");
-        stm.setObject(1, customer.getCustomerName());
-        stm.setObject(2, customer.getCustomerAddress());
-        stm.setObject(3, customer.getCustomerSalary());
-        stm.setObject(4, customer.getCustomerID());
-
-        if (stm.executeUpdate() > 0) {
-            return true;
-        }
-
-        return false;
+        return CrudUtil.executeUpdate("Update Customer set customerName=?,customerAddress=?,salary=? where customerID=?", connection, customer.getCustomerName(), customer.getCustomerAddress(), customer.getCustomerSalary(), customer.getCustomerID());
     }
 
     @Override
     public boolean delete(String id, Connection connection) throws SQLException, ClassNotFoundException {
-        PreparedStatement stm = connection.prepareStatement("Delete from Customer where customerID=?");
-        stm.setObject(1, id);
-        if (stm.executeUpdate() > 0) {
-            return true;
-        }
-        return false;
+        return CrudUtil.executeUpdate("Delete from Customer where customerID=?",connection,id);
     }
 }

@@ -1,36 +1,21 @@
 package dao.custom.impl;
 
+import dao.CrudUtil;
 import dao.custom.orderDAO;
 import entity.Order;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.ArrayList;
 
 public class orderDAOImpl implements orderDAO {
     @Override
     public boolean add(Order order, Connection connection) throws SQLException, ClassNotFoundException {
-        PreparedStatement stm = connection.prepareStatement("insert into `Order` values (?,?,?,?)");
-        stm.setObject(1, order.getOrderId());
-        stm.setObject(2, order.getoDate());
-        stm.setObject(3, order.getCustomerId());
-        stm.setObject(4, order.getTotal());
-
-        if (stm.executeUpdate() > 0) {
-            return true;
-        }
-        return false;
+        return CrudUtil.executeUpdate("insert into `Order` values (?,?,?,?)", connection, order.getOrderId(), order.getoDate(), order.getCustomerId(), order.getTotal());
     }
 
     @Override
     public Order search(String oID, Connection connection) throws SQLException, ClassNotFoundException {
-        PreparedStatement stm = connection.prepareStatement("select * from `Order` where orderID=?");
-        stm.setObject(1, oID);
-        ResultSet rest = stm.executeQuery();
-
+        ResultSet rest = CrudUtil.executeQuery("select * from `Order` where orderID=?", connection, oID);
         Order order = new Order();
         while (rest.next()) {
             order.setOrderId(rest.getString(1));
@@ -42,14 +27,13 @@ public class orderDAOImpl implements orderDAO {
     }
 
     @Override
-    public boolean update(Order order, Connection connection) throws SQLException, ClassNotFoundException {
+    public boolean update(Order order, Connection connection) {
         throw new UnsupportedOperationException("Not Supported Yet");
     }
 
     @Override
     public ArrayList<Order> getAll(Connection connection) throws SQLException, ClassNotFoundException {
-        ResultSet rst = connection.prepareStatement("select * from `Order`").executeQuery();
-
+        ResultSet rst = CrudUtil.executeQuery("select * from `Order`", connection);
         ArrayList<Order> orders = new ArrayList<>();
         while (rst.next()) {
             Order order = new Order();
@@ -66,22 +50,23 @@ public class orderDAOImpl implements orderDAO {
 
     @Override
     public String genarateOrderID(Connection connection) throws SQLException, ClassNotFoundException {
-        ResultSet rset = connection.prepareStatement("select orderID from `Order` order by orderID desc limit 1").executeQuery();
+        ResultSet rset = CrudUtil.executeQuery("select orderID from `Order` order by orderID desc limit 1", connection);
+        String id;
         if (rset.next()) {
             int tempID = Integer.parseInt(rset.getString(1).split("-")[1]);
             tempID = tempID + 1;
             if (tempID < 9) {
-                String id = "O-00" + tempID;
+                id = "O-00" + tempID;
                 return id;
             } else if (tempID < 99) {
-                String id = "O-0" + tempID;
+                id = "O-0" + tempID;
                 return id;
             } else {
-                String id = "O-" + tempID;
+                id = "O-" + tempID;
                 return id;
             }
         } else {
-            String id = "O-001";
+            id = "O-001";
             return id;
         }
 
@@ -89,12 +74,7 @@ public class orderDAOImpl implements orderDAO {
 
     @Override
     public boolean delete(String id, Connection connection) throws SQLException, ClassNotFoundException {
-        PreparedStatement stm = connection.prepareStatement("Delete from `Order` where orderID=?");
-        stm.setObject(1, id);
-        if (stm.executeUpdate() > 0) {
-            return true;
-        }
-        return false;
+        return CrudUtil.executeUpdate("Delete from `Order` where orderID=?", connection, id);
     }
 
 }
